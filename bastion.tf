@@ -94,24 +94,6 @@ resource "aws_iam_policy" "jumpserver_eks_access" {
           "eks:ListNodegroups"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:DescribeInstances",
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation",
-          "ssm:ListCommands"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject"
-        ]
-        Resource = "arn:aws:s3:::*/ssm/*"
       }
     ]
   })
