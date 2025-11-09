@@ -9,6 +9,13 @@ resource "aws_instance" "eks_jumpserver" {
   iam_instance_profile = aws_iam_instance_profile.jumpserver.name
   user_data_base64     = filebase64("${path.module}/bastion-setup.sh")
 
+  lifecycle {
+    # This instructs Terraform to ignore any future changes to the user_data_base64 attribute after the instance is first created.
+    ignore_changes = [
+      user_data_base64,
+    ]
+  }
+
   tags = {
     Name = "eks-jump-server"
   }

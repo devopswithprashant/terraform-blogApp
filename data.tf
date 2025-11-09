@@ -38,12 +38,10 @@ data "aws_key_pair" "jumpserver_key" {
 # data "aws_ami" "ubuntu" {
 #   most_recent = true
 #   owners      = ["099720109477"] # Canonical
-
 #   filter {
 #     name   = "name"
 #     values = ["ubuntu/images/hvm-ssd/ubuntu-22.04-*-server-*"]
 #   }
-
 #   filter {
 #     name   = "virtualization-type"
 #     values = ["hvm"]
