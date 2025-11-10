@@ -80,7 +80,7 @@ jobs:
         aws-region: us-east-1
         role-session-name: GitHubActionsTerraform
         role-to-assume: ${{ secrets.AWS_ADMIN_ROLE }}
-        
+
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -95,6 +95,6 @@ jobs:
       run: terraform plan -destroy -input=false -out=tfplan.out
     
     - name: Terraform Destroy
-      if: github.ref == 'refs/heads/"main"'
+      if: github.ref == 'refs/heads/main'
       run: terraform apply tfplan.out
 
