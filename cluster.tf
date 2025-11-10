@@ -13,7 +13,7 @@ resource "aws_eks_cluster" "my_eks_cluster" {
   }
 
   vpc_config {
-    security_group_ids      = [ aws_security_group.eks_additional.id ]
+    security_group_ids      = [aws_security_group.eks_additional.id]
     endpoint_private_access = true
     endpoint_public_access  = false
     subnet_ids = [
@@ -66,7 +66,7 @@ resource "aws_eks_access_entry" "jumpserver" {
   type              = "STANDARD"
   kubernetes_groups = []
 
-  depends_on = [ 
+  depends_on = [
     aws_eks_cluster.my_eks_cluster,
     aws_iam_role.jumpserver
   ]

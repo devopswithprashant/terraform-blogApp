@@ -5,9 +5,10 @@ resource "aws_instance" "eks_jumpserver" {
   subnet_id                   = data.aws_subnets.nonprod_blog_subnets_public.ids[0]
   associate_public_ip_address = true
 
-  security_groups      = [aws_security_group.jumpserver.id]
-  iam_instance_profile = aws_iam_instance_profile.jumpserver.name
-  user_data_base64     = filebase64("${path.module}/bastion-setup.sh")
+  #security_groups      = [aws_security_group.jumpserver.id]
+  vpc_security_group_ids = [aws_security_group.jumpserver.id]
+  iam_instance_profile   = aws_iam_instance_profile.jumpserver.name
+  user_data_base64       = filebase64("${path.module}/bastion-setup.sh")
 
   lifecycle {
     # This instructs Terraform to ignore any future changes to the user_data_base64 attribute after the instance is first created.
