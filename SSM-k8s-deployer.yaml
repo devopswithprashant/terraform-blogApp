@@ -24,10 +24,6 @@ parameters:
     type: "String"
     description: "Directory containing manifest files in the repository"
     default: "."
-  fileSequence:
-    type: "String"
-    description: "Comma-separated list of manifest files in deployment order"
-    default: "00-namespace.yaml,01-configmap.yaml,02-secret.yaml,03-deployment.yaml,04-service.yaml,05-ingress.yaml"
   kubeconfigPath:
     type: "String"
     description: "Path to kubeconfig file"
@@ -35,11 +31,11 @@ parameters:
   awsRegion:
     type: "String"
     description: "AWS region"
-    default: "us-east-1"
+    default: ""
   clusterName:
     type: "String"
     description: "Name of the EKS cluster"
-    default: "blogapp-cluster"
+    default: ""
 
 mainSteps:
   - name: "ValidateParameters"
@@ -54,7 +50,7 @@ mainSteps:
           echo "Deployment Type: $(if [ '{{ gitRefType }}' = 'tag' ]; then echo 'RELEASE DEPLOYMENT'; else echo 'DEVELOPMENT DEPLOYMENT'; fi)"
           echo "Git Token: $(if [ -n '{{ gitToken }}' ]; then echo '***PROVIDED***'; else echo 'Not provided (public repo)'; fi)"
           echo "Manifest Directory: {{ manifestDirectory }}"
-          echo "File Sequence: {{ fileSequence }}"
+          
 
           # Validate git reference type
           if [ "{{ gitRefType }}" != "branch" ] && [ "{{ gitRefType }}" != "tag" ]; then
@@ -67,8 +63,7 @@ mainSteps:
     inputs:
       runCommand:
         - |
-          echo "Current directory: $(pwd)"
-          ls -la
+          sudo su - ubuntu
           
           echo "Updating kubeconfig..."
           # Ensure kubeconfig directory exists
@@ -88,6 +83,9 @@ mainSteps:
       runCommand:
         - |
           set -e
+
+          sudo su - ubuntu
+
           echo "Current directory: $(pwd)"
           echo "Cloning Git repository..."
           
@@ -159,11 +157,14 @@ mainSteps:
           # kubectl apply -f 05-frontend/
           # kubectl apply -f 06-ingress/
 
+
   - name: "VerifyInitialDeployment"
     action: "aws:runShellScript"
     inputs:
       runCommand:
         - |
+          sudo su - ubuntu
+
           echo "Current directory: $(pwd)"
           echo "Verifying initial deployment..."
           # Wait for critical services
@@ -173,3 +174,6 @@ mainSteps:
           # Check all deployments
           kubectl get deployments -n dwp --kubeconfig "{{ kubeconfigPath }}"
           kubectl get services -n dwp --kubeconfig "{{ kubeconfigPath }}"
+
+
+

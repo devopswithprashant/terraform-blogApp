@@ -4,7 +4,7 @@ resource "aws_ssm_document" "k8s_deployer" {
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("${path.module}/SSM_k8s_deployer.yaml")
+  content = file("${path.module}/SSM-k8s-deployer.yaml")
 
   tags = {
     Name = "k8s-deployer"

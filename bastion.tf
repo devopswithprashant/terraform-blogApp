@@ -18,7 +18,7 @@ resource "aws_instance" "eks_jumpserver" {
   }
 
   tags = {
-    Name = "eks-jump-server"
+    Name = "eks-bastion-blogapp"
   }
 
   depends_on = [aws_security_group.jumpserver]
