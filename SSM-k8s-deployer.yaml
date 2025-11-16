@@ -36,6 +36,10 @@ parameters:
     type: "String"
     description: "Name of the EKS cluster"
     default: ""
+  k8namespace:
+    type: "String"
+    description: "Name of the K8 namespace"
+    default: ""
 
 mainSteps:
   - name: "ValidateParameters"
@@ -168,12 +172,12 @@ mainSteps:
           echo "Current directory: $(pwd)"
           echo "Verifying initial deployment..."
           # Wait for critical services
-          kubectl wait --for=condition=ready pod -l app=blog-backend --timeout=300s -n dwp --kubeconfig "{{ kubeconfigPath }}"
-          kubectl wait --for=condition=ready pod -l app=blog-frontend --timeout=300s -n dwp --kubeconfig "{{ kubeconfigPath }}"
+          kubectl wait --for=condition=ready pod -l app=blog-backend --timeout=300s -n {{ k8namespace }} --kubeconfig "{{ kubeconfigPath }}"
+          kubectl wait --for=condition=ready pod -l app=blog-frontend --timeout=300s -n {{ k8namespace }} --kubeconfig "{{ kubeconfigPath }}"
           
           # Check all deployments
-          kubectl get deployments -n dwp --kubeconfig "{{ kubeconfigPath }}"
-          kubectl get services -n dwp --kubeconfig "{{ kubeconfigPath }}"
+          kubectl get deployments -n {{ k8namespace }} --kubeconfig "{{ kubeconfigPath }}"
+          kubectl get services -n {{ k8namespace }} --kubeconfig "{{ kubeconfigPath }}"
 
 
 
