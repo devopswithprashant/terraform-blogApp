@@ -29,6 +29,10 @@ This Terraform project automates the provisioning of:
 
 ## Architecture
 
+
+![architecture](https://dwp-public-images.s3.us-east-1.amazonaws.com/wiki/dwp-blog-service/aws-architecture-diagram.png)
+
+
 ### Core Components
 
 #### 1. EKS Cluster (`cluster.tf`)
