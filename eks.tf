@@ -16,11 +16,7 @@ resource "aws_eks_cluster" "my_eks_cluster" {
     security_group_ids      = [aws_security_group.eks_additional.id]
     endpoint_private_access = true
     endpoint_public_access  = false
-    subnet_ids = [
-      data.aws_subnets.nonprod_blog_subnets.ids[0],
-      data.aws_subnets.nonprod_blog_subnets.ids[1],
-      data.aws_subnets.nonprod_blog_subnets.ids[2],
-    ]
+    subnet_ids              = module.vpc.private_subnets
   }
 
   # Ensure that IAM Role permissions are created before and deleted
@@ -91,7 +87,7 @@ resource "aws_eks_access_policy_association" "jumpserver_admin" {
 resource "aws_security_group" "eks_additional" {
   name_prefix = "eks-additional-sg"
   description = "Additional security group for EKS cluster - Allow 443 from VPC"
-  vpc_id      = data.aws_vpc.nonprod_blog.id
+  vpc_id      = module.vpc.vpc_id
 
   tags = {
     Name = "eks-additional-sg"
@@ -124,7 +120,7 @@ resource "aws_eks_node_group" "my_eks_node_group" {
   cluster_name    = aws_eks_cluster.my_eks_cluster.name
   node_group_name = "private-large"
   node_role_arn   = aws_iam_role.node_group_role.arn
-  subnet_ids      = data.aws_subnets.nonprod_blog_subnets.ids
+  subnet_ids      = module.vpc.private_subnets
   ami_type        = "AL2023_ARM_64_STANDARD"
   capacity_type   = "ON_DEMAND"
   instance_types  = ["m6g.large"]

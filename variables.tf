@@ -13,8 +13,8 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
-    Name       = local.name
-    Example    = local.name
-    Project    = "DevOps with Prashant Platform"
+    Name    = local.name
+    Example = local.name
+    Project = "DevOps with Prashant Platform"
   }
 }

@@ -7,7 +7,7 @@ resource "aws_instance" "jumpserver" {
 
   vpc_security_group_ids = [aws_security_group.jumpserver.id]
   iam_instance_profile   = aws_iam_instance_profile.jumpserver.name
-  user_data = templatefile("${path.module}/src/bastion-setup.tftpl",{
+  user_data = templatefile("${path.module}/src/bastion-setup.tftpl", {
     environment = local.name
   })
 
