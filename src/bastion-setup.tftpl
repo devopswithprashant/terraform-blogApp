@@ -1,7 +1,9 @@
 #!/bin/bash
 
+echo "Starting setup for ${environment} Bastion server..."
+
 sudo apt update -y
-sudo apt install -y unzip curl
+sudo apt install -y unzip curl jq
 sudo apt-get install -y git
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -14,3 +16,8 @@ curl -LO https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 kubectl version --client
+
+
+sudo apt install postgresql-client -y
+
+psql --version

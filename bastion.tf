@@ -1,34 +1,35 @@
-resource "aws_instance" "eks_jumpserver" {
-  ami                         = "ami-0ecb62995f68bb549"
+resource "aws_instance" "jumpserver" {
+  ami                         = "ami-0de864d6a3bd20ea8"
   instance_type               = "t2.micro"
   key_name                    = data.aws_key_pair.jumpserver_key.key_name
-  subnet_id                   = data.aws_subnets.nonprod_blog_subnets_public.ids[0]
+  subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
 
-  #security_groups      = [aws_security_group.jumpserver.id]
   vpc_security_group_ids = [aws_security_group.jumpserver.id]
   iam_instance_profile   = aws_iam_instance_profile.jumpserver.name
-  user_data_base64       = filebase64("${path.module}/bastion-setup.sh")
+  user_data = templatefile("${path.module}/src/bastion-setup.tftpl", {
+    environment = local.name
+  })
 
-  lifecycle {
-    # This instructs Terraform to ignore any future changes to the user_data_base64 attribute after the instance is first created.
-    ignore_changes = [
-      user_data_base64,
-    ]
-  }
+  # lifecycle {
+  #   # This instructs Terraform to ignore any future changes to the user_data_base64 attribute after the instance is first created.
+  #   ignore_changes = [
+  #     user_data_base64,
+  #   ]
+  # }
 
   tags = {
-    Name = "eks-bastion-blogapp"
+    Name = "${local.name}-jumpserver"
   }
 
-  depends_on = [aws_security_group.jumpserver]
+  #depends_on = [aws_security_group.jumpserver]
 }
 
 
 # Security Group for Jump Server
 resource "aws_security_group" "jumpserver" {
   name_prefix = "jumpserver-sg"
-  vpc_id      = data.aws_vpc.nonprod_blog.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 22
@@ -45,19 +46,19 @@ resource "aws_security_group" "jumpserver" {
   }
 
   tags = {
-    Name = "jumpserver-sg"
+    Name = "${local.name}-jumpserver-sg"
   }
 }
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "jumpserver" {
-  name = "eks-jumpserver-instance-profile"
+  name = "${local.name}-jumpserver-instance-profile"
   role = aws_iam_role.jumpserver.name
 }
 
 # IAM Role for Jump Server
 resource "aws_iam_role" "jumpserver" {
-  name = "eks-jumpserver-role"
+  name = "${local.name}-jumpserver-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -73,13 +74,13 @@ resource "aws_iam_role" "jumpserver" {
   })
 
   tags = {
-    Name = "eks-jumpserver-role"
+    Name = "${local.name}-jumpserver-role"
   }
 }
 
 # IAM Policy for EKS Access
 resource "aws_iam_policy" "jumpserver_eks_access" {
-  name        = "EKSJumpServerAccess"
+  name        = "${local.name}-EKSJumpServerAccess"
   description = "Policy for Jump Server to access EKS cluster"
 
   policy = jsonencode({
