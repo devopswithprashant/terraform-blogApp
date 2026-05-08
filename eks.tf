@@ -1,5 +1,5 @@
 resource "aws_eks_cluster" "my_eks_cluster" {
-  name = local.name
+  name = local.workspaces[terraform.workspace].name
 
   access_config {
     authentication_mode = "API"
@@ -31,7 +31,7 @@ resource "aws_eks_cluster" "my_eks_cluster" {
 
 
 resource "aws_iam_role" "cluster_role" {
-  name = "${local.name}-eks-role"
+  name = "${local.workspaces[terraform.workspace].name}-eks-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -147,7 +147,7 @@ resource "aws_eks_node_group" "my_eks_node_group" {
 
 
 resource "aws_iam_role" "node_group_role" {
-  name = "${local.name}-eks-node-group-role"
+  name = "${local.workspaces[terraform.workspace].name}-eks-node-group-role"
 
   assume_role_policy = jsonencode({
     Statement = [{

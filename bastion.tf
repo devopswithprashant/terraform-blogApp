@@ -8,7 +8,7 @@ resource "aws_instance" "jumpserver" {
   vpc_security_group_ids = [aws_security_group.jumpserver.id]
   iam_instance_profile   = aws_iam_instance_profile.jumpserver.name
   user_data = templatefile("${path.module}/src/bastion-setup.tftpl", {
-    environment = local.name
+    environment = local.workspaces[terraform.workspace].name
   })
 
   # lifecycle {
@@ -19,7 +19,7 @@ resource "aws_instance" "jumpserver" {
   # }
 
   tags = {
-    Name = "${local.name}-jumpserver"
+    Name = "${local.workspaces[terraform.workspace].name}-jumpserver"
   }
 
   #depends_on = [aws_security_group.jumpserver]
@@ -46,19 +46,19 @@ resource "aws_security_group" "jumpserver" {
   }
 
   tags = {
-    Name = "${local.name}-jumpserver-sg"
+    Name = "${local.workspaces[terraform.workspace].name}-jumpserver-sg"
   }
 }
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "jumpserver" {
-  name = "${local.name}-jumpserver-instance-profile"
+  name = "${local.workspaces[terraform.workspace].name}-jumpserver-instance-profile"
   role = aws_iam_role.jumpserver.name
 }
 
 # IAM Role for Jump Server
 resource "aws_iam_role" "jumpserver" {
-  name = "${local.name}-jumpserver-role"
+  name = "${local.workspaces[terraform.workspace].name}-jumpserver-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -74,13 +74,13 @@ resource "aws_iam_role" "jumpserver" {
   })
 
   tags = {
-    Name = "${local.name}-jumpserver-role"
+    Name = "${local.workspaces[terraform.workspace].name}-jumpserver-role"
   }
 }
 
 # IAM Policy for EKS Access
 resource "aws_iam_policy" "jumpserver_eks_access" {
-  name        = "${local.name}-EKSJumpServerAccess"
+  name        = "${local.workspaces[terraform.workspace].name}-EKSJumpServerAccess"
   description = "Policy for Jump Server to access EKS cluster"
 
   policy = jsonencode({

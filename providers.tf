@@ -11,6 +11,7 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
+  #region = lookup(local.workspace_region_map, terraform.workspace, local.workspace_region_map.default)
   region = local.region
 }
 

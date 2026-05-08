@@ -8,7 +8,7 @@ module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "7.2.0"
 
-  identifier = local.name
+  identifier = local.workspaces[terraform.workspace].name
 
   # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
   engine                   = "postgres"
@@ -16,7 +16,7 @@ module "db" {
   engine_lifecycle_support = "open-source-rds-extended-support-disabled"
   family                   = "postgres17" # DB parameter group
   major_engine_version     = "17"         # DB option group
-  instance_class           = "db.t4g.large"
+  instance_class           = "db.t4g.micro"
 
   allocated_storage     = 20
   max_allocated_storage = 100
@@ -24,8 +24,8 @@ module "db" {
   # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
   # "Error creating DB Instance: InvalidParameterValue: MasterUsername
   # user cannot be used as it is a reserved word used by the engine"
-  db_name  = "completePostgresql"
-  username = "complete_postgresql"
+  db_name  = "blogdb"
+  username = "blogdbadmin"
   port     = 5432
 
   # Setting manage_master_user_password_rotation to false after it
@@ -46,7 +46,7 @@ module "db" {
   backup_window           = "03:00-06:00"
   backup_retention_period = 1
 
-  tags = local.tags
+  tags = local.workspaces[terraform.workspace].tags
 }
 
 # module "db_default" {
@@ -90,7 +90,7 @@ module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 5.0"
 
-  name        = local.name
+  name        = local.workspaces[terraform.workspace].name
   description = "Complete PostgreSQL example security group"
   vpc_id      = module.vpc.vpc_id
 
@@ -105,7 +105,7 @@ module "security_group" {
     },
   ]
 
-  tags = local.tags
+  tags = local.workspaces[terraform.workspace].tags
 }
 
 
@@ -115,7 +115,7 @@ module "security_group" {
 
 # provider "aws" {
 #   alias  = "region2"
-#   region = local.region2
+#   region = local.workspaces[terraform.workspace].region2
 # }
 
 # module "kms" {
