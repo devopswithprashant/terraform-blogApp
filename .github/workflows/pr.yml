@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         environment: [nonprod, prod]
-    environment: ${{ matrix.environment }}
+    #environment: ${{ matrix.environment }}
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
