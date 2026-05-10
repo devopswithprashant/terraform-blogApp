@@ -3,6 +3,10 @@
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
+# EKS Cluster Auth
+# data "aws_eks_cluster_auth" "cluster" {
+#   name = aws_eks_cluster.my_eks_cluster.name
+# }
 
 data "aws_key_pair" "jumpserver_key" {
   key_name = local.workspaces[terraform.workspace].bastion_host_key_name

@@ -17,12 +17,12 @@ locals {
     default = "us-west-2"
   }
 
-  region = lookup(local.workspace_primary_region_map, terraform.workspace, local.workspace_primary_region_map.default)
+  region  = lookup(local.workspace_primary_region_map, terraform.workspace, local.workspace_primary_region_map.default)
   region2 = lookup(local.workspace_secondary_region_map, terraform.workspace, local.workspace_secondary_region_map.default)
 
   workspaces = {
     nonprod = {
-      name    = "dwp-platform-nonprod"
+      name                  = "dwp-platform-nonprod"
       bastion_host_key_name = "bastion-host-key"
 
       vpc_cidr = "10.0.0.0/16"
@@ -34,7 +34,7 @@ locals {
       }
     }
     prod = {
-      name    = "dwp-platform"
+      name                  = "dwp-platform"
       bastion_host_key_name = "prod-bastion-host-key"
 
       vpc_cidr = "10.0.0.0/16"
