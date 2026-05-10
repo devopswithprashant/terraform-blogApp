@@ -1,24 +1,27 @@
-name: 'Destroy'
+name: 'Validation'
 
 on:
-  workflow_dispatch:
+  pull_request:
+
 
 permissions:
   contents: read
-  id-token: write # <--- REQUIRED for OIDC
+  id-token: write 
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+
 jobs:
-  Destroy:
-    name: 'Destroy'
+  validate:
+    name: 'Validate and Plan'
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: [nonprod, prod]
-    environment: ${{ matrix.environment }}
+    #environment: ${{ matrix.environment }}
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -44,24 +47,21 @@ jobs:
         role-session-name: GitHubActionsTerraform
         role-to-assume: ${{ secrets.AWS_ADMIN_ROLE }}
 
-
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: terraform init
-      
+
     - name: Terraform Workspace
       run: terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
     
+    - name: Terraform Validate
+      run: terraform validate
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
-    
-    # Destroy Terraform managed infrastructure
-    - name: Terraform Plan Destroy
-      run: terraform plan -destroy -input=false -out=tfplan.out
-    
-    - name: Terraform Destroy
-      if: github.ref == 'refs/heads/main'
-      run: terraform apply tfplan.out
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false -out=tfplan.out
 
