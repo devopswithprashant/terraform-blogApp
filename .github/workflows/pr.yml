@@ -1,0 +1,67 @@
+name: 'Validation'
+
+on:
+  pull_request:
+
+
+permissions:
+  contents: read
+  id-token: write 
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+
+jobs:
+  validate:
+    name: 'Validate and Plan'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [nonprod, prod]
+    environment: ${{ matrix.environment }}
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.13.5"
+    
+    # configure AWS Credentials 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v6
+      with:
+        aws-region: us-east-1
+        role-session-name: GitHubActionsTerraform
+        role-to-assume: ${{ secrets.AWS_ADMIN_ROLE }}
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Workspace
+      run: terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
+    
+    - name: Terraform Validate
+      run: terraform validate
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false -out=tfplan.out
+
