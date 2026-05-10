@@ -3,38 +3,13 @@
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
-# data "aws_vpc" "nonprod_blog" {
-#   tags = {
-#     Name = "nonprod-blog-vpc"
-#     Type = "nonprod"
-#   }
+# EKS Cluster Auth
+# data "aws_eks_cluster_auth" "cluster" {
+#   name = aws_eks_cluster.my_eks_cluster.name
 # }
-
-# data "aws_subnets" "nonprod_blog_subnets" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.nonprod_blog.id]
-#   }
-
-#   tags = {
-#     Type = "Private"
-#   }
-# }
-
-# data "aws_subnets" "nonprod_blog_subnets_public" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.nonprod_blog.id]
-#   }
-
-#   tags = {
-#     Type = "Public"
-#   }
-# }
-
 
 data "aws_key_pair" "jumpserver_key" {
-  key_name = "bastion-host-key"
+  key_name = local.workspaces[terraform.workspace].bastion_host_key_name
 }
 
 # # Ubuntu AMI data source
